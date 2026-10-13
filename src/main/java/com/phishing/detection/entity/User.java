@@ -5,9 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class User {
 
@@ -16,9 +13,7 @@ public class User {
     private Long id;
 
     private String name;
-
     private String email;
-
     private String password;
 
     public User() {
