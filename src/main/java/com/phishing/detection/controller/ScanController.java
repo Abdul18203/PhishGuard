@@ -4,6 +4,8 @@ package com.phishing.detection.controller;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,9 @@ import com.phishing.detection.service.UrlValidationService;
 @RestController
 @RequestMapping("/api/scan")
 public class ScanController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ScanController.class);
 
     private final UrlValidationService urlValidationService;
     private final UrlFeatureService urlFeatureService;
@@ -101,6 +106,9 @@ public class ScanController {
                     && !"LEGITIMATE".equals(
                             aiPrediction.getPrediction()))) {
 
+                logger.error(
+                        "AI service returned an invalid prediction response.");
+
                 return ResponseEntity
                         .status(HttpStatus.BAD_GATEWAY)
                         .body(new ErrorResponse(
@@ -108,6 +116,12 @@ public class ScanController {
             }
 
         } catch (RestClientException ex) {
+            logger.error(
+                    "AI prediction request failed. Exception type: {}. Message: {}",
+                    ex.getClass().getName(),
+                    ex.getMessage(),
+                    ex);
+
             return ResponseEntity
                     .status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body(new ErrorResponse(
@@ -121,34 +135,24 @@ public class ScanController {
         history.setUrlLength(response.getUrlLength());
         history.setDotCount(response.getDotCount());
         history.setHyphenCount(response.getHyphenCount());
-
         history.setSpecialCharacterCount(
                 response.getSpecialCharacterCount());
-
         history.setSubdomainCount(
                 response.getSubdomainCount());
-
         history.setContainsAtSymbol(
                 response.isContainsAtSymbol());
-
         history.setUsesIpAddress(
                 response.isUsesIpAddress());
-
         history.setUsesHttps(
                 response.isUsesHttps());
-
         history.setPrediction(
                 aiPrediction.getPrediction());
-
         history.setPhishingScore(
                 aiPrediction.getPhishingScore());
-
         history.setLegitimateScore(
                 aiPrediction.getLegitimateScore());
-
         history.setModel(
                 aiPrediction.getModel());
-
         history.setScannedAt(LocalDateTime.now());
 
         scanHistoryRepository.save(history);
