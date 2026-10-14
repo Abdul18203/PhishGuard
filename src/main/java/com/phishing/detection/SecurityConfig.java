@@ -1,4 +1,3 @@
-
 package com.phishing.detection;
 
 import java.util.List;
@@ -30,7 +29,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                List.of(
+                        "http://localhost:5173",
+                        "https://phishguard-inky.vercel.app"
+                )
         );
 
         configuration.setAllowedMethods(
